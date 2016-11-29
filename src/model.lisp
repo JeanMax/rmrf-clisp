@@ -1,7 +1,9 @@
 (in-package :cl-user)
 
 (defpackage rmrf.model
-  (:use :cl :sxql)
+  (:use :cl
+        :sxql)
+        ;; :rmrf.web
   (:import-from :rmrf.db
                 :db
                 :with-connection
@@ -9,12 +11,12 @@
   (:import-from :datafly
                 :execute
                 :retrieve-all
-                :retrieve-one
-                :defmodel)
+                :retrieve-one)
   (:import-from :sxql
                 :create-table)
   (:export :create-user-table
            :add-user
+           :check-password
            :find-user
            :find-user-by-email
            :authenticate-user))
@@ -47,14 +49,21 @@
 (defun add-user (email password)
   "Add user record to database."
   (if (find-user-by-email email)
-      nil
+      "This account already exists."
       (progn
         (with-transaction (db)
           (execute
            (insert-into :user
              (set= :email email
                    :password (cl-pass:hash password)))))
-        t)))
+        nil)))
+
+(defun check-password (password password2) ;TODO: rename
+  (cond ((< (length password) 6)
+         "Your password is too short. (6 characters minimum)")
+        ((string/= password password2)
+         "Your password and confirmation password do not match.")
+        (t nil)))
 
 (defun find-user (id)
   "Lookup user record by id."
@@ -73,14 +82,8 @@
      :as 'user)))
 
 (defun authenticate-user (email password)
-  "Lookup user record and validate password. Returns two values:
-   1st value, was password correct T or NIL
-   2nd value, was user found, T or NIL
-Example:
-   (VALUES NIL NIL) -> user not found
-   (VALUES NIL T) -> user found, but wrong password
-   (VALUES T T) -> password correct"
-  (let ((password-hash (getf (find-user-by-email email) :password)))
-    (if password-hash
-        (values (cl-pass:check-password password password-hash) t)
-        (values nil nil))))
+  "Lookup user record and validate password."
+  (let ((user (find-user-by-email email)))
+    (if (and user (cl-pass:check-password password (user-password user)))
+        (user-id user)
+        nil)))
