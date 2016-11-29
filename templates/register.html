@@ -1,0 +1,14 @@
+{% extends "layouts/fullscreen-form.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block form %}
+    <form action="/register" method="post">
+        <input name="form[email]" value="{{email}}" type="text" placeholder="Email" class="border-radius-top" />
+        <input name="form[password]" type="password" placeholder="Password" class="no-radius"  />
+        <input name="form[password2]" type="password" placeholder="Confirm Password" class="no-radius"  />
+
+        <input type="submit" value="Register" class="button small border-radius-bottom coral-bg" style="width: 100%" />
+        {% if error %}<label class="error">{{error}}</label>{% endif %}
+    </form>
+{% endblock %}

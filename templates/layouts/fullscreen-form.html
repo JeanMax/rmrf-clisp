@@ -1,0 +1,43 @@
+{% extends "layouts/default.html" %}
+
+{% block head %}
+    <style>
+     html, body {
+         height: 100%;
+         background:#262c31;
+     }
+
+     .main {
+         height: 100%;
+         width: 100%;
+         display: table;
+     }
+
+     .wrapper {
+         display: table-cell;
+         height: 100%;
+         vertical-align: middle;
+     }
+     #login {
+         width: 30%;
+     }
+     @media all and (max-width:800px) {
+         #login {
+             width: 90%;
+         }
+     }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="main">
+        <div class="wrapper">
+            <div id="login" class="row" style="margin: auto">
+                <div class="large-12 columns text-center">
+                    <img src="img/logo.png" alt="logo"/>
+                    {% block form %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
